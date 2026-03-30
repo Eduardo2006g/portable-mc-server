@@ -1,0 +1,27 @@
+services:
+  minecraft:
+    image: itzg/minecraft-server
+    container_name: minecraft
+    ports:
+      - "25565:25565"
+    environment:
+      EULA: "TRUE"
+      MEMORY: "${MINECRAFT_MEMORY:-2G}"
+      TYPE: "${MINECRAFT_TYPE:-PAPER}"
+      VERSION: "${MINECRAFT_VERSION:-1.21.4}"
+      ONLINE_MODE: "FALSE"
+      #WHITELIST: "${WHITELIST}"
+      ENFORCE_WHITELIST: "FALSE"
+      ENABLE_WHITELIST: "FALSE"
+      JVM_OPTS: "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200"
+    volumes:
+      - ./world-data:/data
+    restart: "no"
+    deploy:
+      resources:
+        limits:
+          cpus: "3.0"
+          memory: 4G
+        reservations:
+          cpus: "1.0"
+          memory: 3G
