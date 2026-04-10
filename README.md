@@ -56,7 +56,7 @@ All players must install:
    * Create a project in Google Cloud Console
    * Enable Google Drive API
    * Create OAuth 2.0 credentials (Desktop App)
-   * Download the file, rename it to `credentials.json`, and place it in the root folder
+   * Download the file, rename it to `credentials.json`, and place it in the auth folder
 
 3. **Configure variables:**
    Open `config.py` and set:
@@ -73,18 +73,32 @@ All players must install:
 
 ---
 
-## 🎁 Alternative Quick Start (Windows)
+## 🎁 Alternative  Start
 
-### ⚠️ Complete setup up to step 3 before using this ⚠️
+#### ⚠️ Complete setup up to step 3 before using this
 
-The project includes a **`run.bat`** script (Windows only) that automates the remaining setup.
+The project includes a **`run.bat`** file and a **`run.sh`** file located inside the `scripts` folder (for Windows and Linux, respectively) that automate the remaining configurations (just run and play 😊). However, we still recommend reading the documentation for a better understanding of the processes.
 
-### Run via CMD / PowerShell
+---
 
-## 🟢 Starting the Server
+### 🟢 Starting the Server
+
+
+#### Running via CMD / PowerShell (Windows)
+
 ```bash
-.\run.bat start
+.\scripts\run.bat start
 ```
+
+#### Running via Terminal (Linux)
+
+In Linux, you need to ensure the file has execute permission (`chmod +x`) and use the backslash:
+```bash
+./scripts/run.sh start
+```
+
+---
+
 
 This will:
 
@@ -120,12 +134,22 @@ Connect to: 26.xxx.xxx.xxx:25565
 ==================================================
 ```
 
-## 🛑 Stopping the Server
+### 🛑 Stopping the Server
 
+
+#### Running via CMD / PowerShell (For Windows)
+```bash
+.\scripts\run.bat stop
+```
+
+#### Running via Linux
 
 ```bash
-.\run.bat stop
+./scripts/run.sh stop
 ```
+
+
+
 This will:
 
 * Deactivate (or create) the virtual environment
@@ -214,7 +238,10 @@ http://localhost:8501
 
 4. Connect to the host's IP when the server is running
 
+Aqui está uma sugestão de README focada na parte técnica de adição de mods, mantendo o estilo organizado e técnico que você costuma usar nos seus projetos.
+
 ---
+
 
 ## 🔒 Security and Usage Rules
 
@@ -233,3 +260,4 @@ http://localhost:8501
 * Tailscale is more secure and stable for internet-based play
 * Radmin VPN is simpler and ideal for LAN-like environments
 * Both options are fully supported by this project
+* [How to add mods to your service](docs/Mods.md)
