@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# 1. Sobe para a raiz do projeto (Pai do diretório onde o script está)
+# entra na raiz do projeto
 cd "$(dirname "$0")/.."
 
 echo "=== Portable Minecraft Server Manager (Linux) ==="
 echo "[DEBUG] Working Directory: $(pwd)"
 
-# --- 1. Verificacao/Criacao da VENV na Raiz ---
+# verifica se a venv existe, se não, cria uma
 if [ ! -d ".venv" ]; then
     echo "[INFO] Ambiente virtual nao encontrado. Criando na raiz..."
     python3 -m venv .venv
@@ -16,11 +16,11 @@ if [ ! -d ".venv" ]; then
     fi
 fi
 
-# --- 2. Ativacao da VENV ---
+# ativa venv
 echo "[INFO] Ativando ambiente virtual..."
 source .venv/bin/activate
 
-# --- 3. Instalacao de Dependencias ---
+# instala depedencias
 if [ ! -f "scripts/.venv/.deps_installed" ]; then
     if [ -f "requirements.txt" ]; then
         echo "[INFO] Instalando dependencias a partir da raiz..."
@@ -38,13 +38,13 @@ if [ ! -f "scripts/.venv/.deps_installed" ]; then
     fi
 fi
 
-# --- 4. Verificacao do Docker ---
+# verifica se o docker tá rodando
 if ! docker info > /dev/null 2>&1; then
     echo "[ERRO] Docker nao esta rodando! Certifique-se de que o daemon do Docker esta ativo."
     exit 1
 fi
 
-# --- 5. Roteamento de Comandos ---
+# roteamento dos comandos
 case "$1" in
     start)
         echo "[INFO] Subindo Containers e Servidor..."
@@ -64,7 +64,7 @@ case "$1" in
         ;;
     *)
         echo "[INFO] Iniciando Interface Streamlit..."
-        # Como estamos na raiz, o app.py é encontrado diretamente
+        # roda streamlit
         python3 -m streamlit run app.py
         ;;
 esac
