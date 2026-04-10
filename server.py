@@ -32,7 +32,7 @@ def get_drive_service():
             creds.refresh(Request())
         else:
             if not creds_path.exists():
-                raise FileNotFoundError("credentials.json não encontrado. Siga o Passo 2 do guia.")
+                raise FileNotFoundError("credentials.json not found. Follow Step 2 of the guide.")
             flow = InstalledAppFlow.from_client_secrets_file(str(creds_path), SCOPES)
             creds = flow.run_local_server(port=0)
         with open(token_path, "w") as f:
@@ -42,7 +42,7 @@ def get_drive_service():
 
 
 def download_world(log=print):
-    log("📥 Procurando mundo no Google Drive...")
+    log("📥 Searching the world on Google Drive...")
     service = get_drive_service()
 
     results = service.files().list(
@@ -52,12 +52,12 @@ def download_world(log=print):
     files = results.get("files", [])
 
     if not files:
-        log("ℹ️ Nenhum mundo no Drive. Iniciando do zero.")
+        log("ℹ️ No world found on Drive. Starting from scratch.")
         return False
 
     file = files[0]
-    log(f"✅ Mundo encontrado (modificado em {file['modifiedTime']})")
-    log("⬇️ Baixando...")
+    log(f"✅ World found (modified on {file['modifiedTime']})")
+    log("⬇️ Downloading...")
 
     zip_path = BASE_DIR / WORLD_FILENAME
     request = service.files().get_media(fileId=file["id"])
@@ -68,7 +68,7 @@ def download_world(log=print):
         while not done:
             _, done = downloader.next_chunk()
 
-    log("📦 Extraindo mundo...")
+    log("📦 Extracting world...")
     world_dir = BASE_DIR / "world-data"
     if world_dir.exists():
         shutil.rmtree(world_dir)
@@ -78,16 +78,16 @@ def download_world(log=print):
         zf.extractall(str(world_dir))
 
     zip_path.unlink()
-    log("✅ Mundo restaurado!")
+    log("✅ World restored!")
     return True
 
 def upload_world(log=print):
     world_dir = BASE_DIR / "world-data"
     if not world_dir.exists():
-        log("⚠️ Pasta world-data não encontrada.")
+        log("⚠️ Folder world-data not found.")
         return
 
-    log("📦 Comprimindo mundo...")
+    log("📦 Compressing world...")
     zip_path = BASE_DIR / WORLD_FILENAME
 
     with zipfile.ZipFile(str(zip_path), "w", zipfile.ZIP_DEFLATED) as zf:
@@ -96,9 +96,9 @@ def upload_world(log=print):
                 zf.write(file, file.relative_to(world_dir))
 
     size_mb = zip_path.stat().st_size / (1024 * 1024)
-    log(f"✅ Comprimido: {size_mb:.1f} MB")
+    log(f"✅ Compressed: {size_mb:.1f} MB")
 
-    log("⬆️ Enviando pro Google Drive...")
+    log("⬆️ Uploading to Google Drive...")
     service = get_drive_service()
 
     results = service.files().list(
@@ -134,14 +134,14 @@ def upload_world(log=print):
                     progress = int(status.progress() * 100)
                     log(f"⬆️ Upload: {progress}%")
             except Exception as e:
-                log(f"⚠️ Erro no upload, tentando novamente: {e}")
+                log(f"⚠️ Error during upload, retrying: {e}")
 
     try:
         zip_path.unlink()
-        log("✅ Mundo salvo no Google Drive!")
+        log("✅ World saved on Google Drive!")
 
     except Exception as e:
-        log(f"⚠️ Não foi possível apagar o zip local, mas o upload foi feito: {e}")
+        log(f"⚠️ Error occurred while deleting the local zip file, but the upload was successful: {e}")
 
 # discord
 
@@ -172,26 +172,25 @@ def start_docker(log=print):
     env["MINECRAFT_MEMORY"] = MINECRAFT_MEMORY
     #env["WHITELIST"] = ",".join(WHITELIST_PLAYERS)
 
-    log("🚀 Subindo servidor Minecraft...")
+    log("🚀 Starting Minecraft server...")
     result = subprocess.run(
         ["docker", "compose", "-f", str(compose_path), "up", "-d"],
         env=env, capture_output=True, text=True
     )
 
     if result.returncode != 0:
-        log(f"❌ Erro ao subir Docker: {result.stderr}")
+        log(f"❌ Error starting Docker: {result.stderr}")
         return False
 
-    log("✅ Servidor no ar!")
+    log("✅ Server is running!")
     return True
 
 
 def stop_docker(log=print):
     compose_path = BASE_DIR / "docker-compose.yml"
-    log("🛑 Parando servidor...")
+    log("🛑 Stopping server...")
     subprocess.run(["docker", "compose", "-f", str(compose_path), "down"])
-    log("✅ Servidor parado.")
-
+    log("✅ Server stopped.")
 
 # fluxos principais
 
@@ -201,11 +200,11 @@ def start_server(log=print):
     if not start_docker(log):
         return False
 
-    meu_ip = TAILSCALE_IPS.get(MEU_NOME, "IP não configurado")
+    meu_ip = TAILSCALE_IPS.get(MEU_NOME, "IP not configured")
     notify_discord(
-        f"🟢 **Servidor no ar!**\n"
-        f"Hosteado por: **{MEU_NOME}**\n"
-        f"Conecte em: `{meu_ip}:{MINECRAFT_PORT}`"
+        f"🟢 **Server is running!**\n"
+        f"Hosted by: **{MEU_NOME}**\n"
+        f"Connect at: `{meu_ip}:{MINECRAFT_PORT}`"
     )
     return True
 
@@ -213,4 +212,4 @@ def start_server(log=print):
 def stop_server(log=print):
     stop_docker(log)
     upload_world(log)
-    notify_discord(f"🔴 **Servidor encerrado** por **{MEU_NOME}**. Mundo salvo no Drive!")
+    notify_discord(f"🔴 **Server stopped** by **{MEU_NOME}**. World saved on Drive!")

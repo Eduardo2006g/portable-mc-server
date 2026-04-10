@@ -165,7 +165,7 @@ Stopping everything...
 🎮 MINECRAFT SERVER — SHUTTING DOWN
 ==================================================
 
-Are you sure you want to stop? (y/n): y
+Are you sure you want to stop? (s/n): s
 🛑 Stopping server...
 [+] Running 2/2
  ✔ Container minecraft                 Removed                                                                     
